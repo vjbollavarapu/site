@@ -42,9 +42,15 @@ class AnalyticsMiddleware(MiddlewareMixin):
         if not should_track_request(request):
             return None
         
-        # Get or create session
-        session_id = SessionManager.get_or_create_session(request)
-        request._analytics_session_id = session_id
+        # Get or create session (handles Redis failures gracefully)
+        try:
+            session_id = SessionManager.get_or_create_session(request)
+            request._analytics_session_id = session_id
+        except Exception as e:
+            logger.warning(f"Analytics session creation failed (Redis may be unavailable): {str(e)}")
+            # Continue without analytics tracking if Redis is unavailable
+            request._analytics_session_id = None
+            return None
         
         # Extract analytics data
         ip_address = get_client_ip(request)
@@ -100,8 +106,12 @@ class AnalyticsMiddleware(MiddlewareMixin):
         if not session_id:
             return response
         
-        # Update session activity
-        SessionManager.update_session_activity(session_id)
+        # Update session activity (handles Redis failures gracefully)
+        try:
+            SessionManager.update_session_activity(session_id)
+        except Exception as e:
+            logger.warning(f"Analytics session update failed (Redis may be unavailable): {str(e)}")
+            # Continue without updating session if Redis is unavailable
         
         # Get page view data
         page_view_data = getattr(request, '_analytics_page_view_data', None)
@@ -166,8 +176,12 @@ class AnalyticsMiddleware(MiddlewareMixin):
         return response
     
     def process_exception(self, request, exception):
-        """Handle exceptions"""
-        # Log error event if needed
-        logger.error(f"Analytics middleware exception: {str(exception)}")
+        """Handle exceptions gracefully"""
+        # Log warning instead of error for Redis connection issues
+        if 'Connection refused' in str(exception) or 'Redis' in str(exception) or '6379' in str(exception):
+            logger.warning(f"Analytics middleware: Redis connection unavailable - {str(exception)}")
+        else:
+            logger.error(f"Analytics middleware exception: {str(exception)}")
+        # Don't block the request - return None to let Django handle it normally
         return None
 

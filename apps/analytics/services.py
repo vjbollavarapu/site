@@ -61,8 +61,11 @@ class TrackEvents:
                 'page_views': 0,
                 'events': 0,
             }
-            cache.set(CACHE_KEY_SESSION.format(session_id), session_data, 
-                     getattr(settings, 'ANALYTICS_SESSION_TIMEOUT', 1800))
+            try:
+                cache.set(CACHE_KEY_SESSION.format(session_id), session_data, 
+                         getattr(settings, 'ANALYTICS_SESSION_TIMEOUT', 1800))
+            except Exception as e:
+                logger.warning(f"Cache set error (Redis may be unavailable): {str(e)}")
         
         session_data = SessionManager.get_session_data(session_id)
         if not session_data:
@@ -75,8 +78,11 @@ class TrackEvents:
                 'page_views': 0,
                 'events': 0,
             }
-            cache.set(CACHE_KEY_SESSION.format(session_id), session_data,
-                     getattr(settings, 'ANALYTICS_SESSION_TIMEOUT', 1800))
+            try:
+                cache.set(CACHE_KEY_SESSION.format(session_id), session_data,
+                         getattr(settings, 'ANALYTICS_SESSION_TIMEOUT', 1800))
+            except Exception as e:
+                logger.warning(f"Cache set error (Redis may be unavailable): {str(e)}")
         
         return session_id, session_data
     
@@ -84,12 +90,20 @@ class TrackEvents:
         """
         Update session data
         """
-        session_data = SessionManager.get_session_data(session_id)
+        try:
+            session_data = SessionManager.get_session_data(session_id)
+        except Exception as e:
+            logger.warning(f"Session data retrieval error (Redis may be unavailable): {str(e)}")
+            session_data = None
+        
         if session_data:
             session_data.update(kwargs)
             session_data['last_activity'] = time.time()
-            cache.set(CACHE_KEY_SESSION.format(session_id), session_data,
-                     getattr(settings, 'ANALYTICS_SESSION_TIMEOUT', 1800))
+            try:
+                cache.set(CACHE_KEY_SESSION.format(session_id), session_data,
+                         getattr(settings, 'ANALYTICS_SESSION_TIMEOUT', 1800))
+            except Exception as e:
+                logger.warning(f"Cache set error (Redis may be unavailable): {str(e)}")
             return session_data
         return None
     
