@@ -478,7 +478,10 @@ def calculate_aggregated_stats(date=None):
         stats['bounce_rate'] = (single_page_sessions / total_sessions) * 100
     
     # Cache for 1 hour
-    cache.set(cache_key, stats, CACHE_TIMEOUT)
+    try:
+        cache.set(cache_key, stats, CACHE_TIMEOUT)
+    except Exception as e:
+        logger.warning(f"Cache set error (Redis may be unavailable): {str(e)}")
     
     return stats
 
@@ -564,7 +567,10 @@ def get_dashboard_stats(date_from=None, date_to=None):
         stats['bounce_rate'] = (single_page_sessions / total_sessions) * 100
     
     # Cache for 1 hour
-    cache.set(cache_key, stats, CACHE_TIMEOUT)
+    try:
+        cache.set(cache_key, stats, CACHE_TIMEOUT)
+    except Exception as e:
+        logger.warning(f"Cache set error (Redis may be unavailable): {str(e)}")
     
     return stats
 
