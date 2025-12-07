@@ -150,7 +150,6 @@ def join_waitlist(request):
             logger.error(f"Failed to send webhook: {e}")
         
         # Only increment rate limit on successful submission
-        from django_ratelimit.core import is_ratelimited
         from django.conf import settings
         rate_limit = getattr(settings, 'WAITLIST_RATE_LIMIT', '10/h')
         is_ratelimited(request, group='waitlist-join', key='ip', rate=rate_limit, method='POST', increment=True)
