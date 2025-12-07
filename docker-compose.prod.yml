@@ -1,0 +1,155 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: sitebackend_db_prod
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sitebackend_network
+    # Remove port mapping in production for security
+    # ports:
+    #   - "5432:5432"
+
+  redis:
+    image: redis:7-alpine
+    container_name: sitebackend_redis_prod
+    volumes:
+      - redis_data_prod:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sitebackend_network
+    # Remove port mapping in production
+    # ports:
+    #   - "6379:6379"
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sitebackend_web_prod
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             gunicorn sitebackend.wsgi:application --bind 0.0.0.0:8000 --workers 4 --timeout 120 --access-logfile - --error-logfile -"
+    volumes:
+      - staticfiles_prod:/app/staticfiles
+      - mediafiles_prod:/app/mediafiles
+    env_file:
+      - .env.production
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/admin/login/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - sitebackend_network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sitebackend_celery_prod
+    command: celery -A sitebackend worker -l info --concurrency=4
+    volumes:
+      - staticfiles_prod:/app/staticfiles
+      - mediafiles_prod:/app/mediafiles
+    env_file:
+      - .env.production
+    depends_on:
+      - db
+      - redis
+      - web
+    restart: unless-stopped
+    networks:
+      - sitebackend_network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  celery-beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sitebackend_celery_beat_prod
+    command: celery -A sitebackend beat -l info
+    volumes:
+      - staticfiles_prod:/app/staticfiles
+      - mediafiles_prod:/app/mediafiles
+    env_file:
+      - .env.production
+    depends_on:
+      - db
+      - redis
+      - celery
+    restart: unless-stopped
+    networks:
+      - sitebackend_network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  nginx:
+    image: nginx:alpine
+    container_name: sitebackend_nginx_prod
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - staticfiles_prod:/app/staticfiles:ro
+      - mediafiles_prod:/app/mediafiles:ro
+    depends_on:
+      - web
+    restart: unless-stopped
+    networks:
+      - sitebackend_network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  postgres_data_prod:
+  redis_data_prod:
+  staticfiles_prod:
+  mediafiles_prod:
+
+networks:
+  sitebackend_network:
+    driver: bridge
+

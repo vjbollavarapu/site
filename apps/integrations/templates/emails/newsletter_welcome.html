@@ -1,0 +1,31 @@
+{% extends "emails/base.html" %}
+
+{% block title %}Welcome to our newsletter!{% endblock %}
+
+{% block header %}Welcome! 👋{% endblock %}
+
+{% block content %}
+<p>Hello {{ name }},</p>
+
+<p>Welcome to our newsletter! We're thrilled to have you join our community.</p>
+
+<p><strong>What to expect:</strong></p>
+<ul>
+    <li>Weekly updates and insights</li>
+    <li>Exclusive content and offers</li>
+    <li>Latest news and announcements</li>
+    <li>Tips and best practices</li>
+</ul>
+
+<p>Your email preference is set to: <strong>{{ preference }}</strong></p>
+
+<p>You can manage your preferences or unsubscribe at any time:</p>
+<p style="text-align: center;">
+    <a href="{{ manage_url }}" class="button">Manage Preferences</a>
+</p>
+
+<p>Thank you for subscribing, and we look forward to sharing valuable content with you!</p>
+
+<p>Best regards,<br>
+The Team</p>
+{% endblock %}

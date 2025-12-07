@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Prospect Management{% endblock %}
+
+{% block content %}
+<h1>Dashboard</h1>
+
+<div class="stats">
+    <div class="stat-card">
+        <h3>{{ total_leads }}</h3>
+        <p>Total Leads</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ new_leads }}</h3>
+        <p>New Leads</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ qualified_leads }}</h3>
+        <p>Qualified Leads</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ converted_leads }}</h3>
+        <p>Converted Leads</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ total_contacts }}</h3>
+        <p>Total Contacts</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ new_contacts }}</h3>
+        <p>New Contacts</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ total_waitlist }}</h3>
+        <p>Total Waitlist</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ pending_waitlist }}</h3>
+        <p>Pending</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ approved_waitlist }}</h3>
+        <p>Approved</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ onboarded_waitlist }}</h3>
+        <p>Onboarded</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ total_newsletter }}</h3>
+        <p>Total Newsletter</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ subscribed_newsletter }}</h3>
+        <p>Subscribed</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ unsubscribed_newsletter }}</h3>
+        <p>Unsubscribed</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ bounced_newsletter }}</h3>
+        <p>Bounced</p>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 2rem;">
+    <div class="card">
+        <h2>Recent Leads</h2>
+        {% if recent_leads %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for lead in recent_leads %}
+                    <tr>
+                        <td>{{ lead.first_name }} {{ lead.last_name }}</td>
+                        <td>{{ lead.email }}</td>
+                        <td><span class="badge badge-{{ lead.status }}">{{ lead.get_status_display }}</span></td>
+                        <td>{{ lead.created_at|date:"M d" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <p style="margin-top: 1rem;"><a href="{% url 'leads:lead_list' %}" class="btn btn-primary">View All Leads</a></p>
+        {% else %}
+            <p>No leads yet.</p>
+        {% endif %}
+    </div>
+    
+    <div class="card">
+        <h2>Recent Contacts</h2>
+        {% if recent_contacts %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for contact in recent_contacts %}
+                    <tr>
+                        <td>{{ contact.name }}</td>
+                        <td>{{ contact.email }}</td>
+                        <td><span class="badge badge-{{ contact.status }}">{{ contact.get_status_display }}</span></td>
+                        <td>{{ contact.created_at|date:"M d" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <p style="margin-top: 1rem;"><a href="{% url 'contacts:contact_list' %}" class="btn btn-primary">View All Contacts</a></p>
+        {% else %}
+            <p>No contacts yet.</p>
+        {% endif %}
+    </div>
+    
+    <div class="card">
+        <h2>Recent Waitlist Entries</h2>
+        {% if recent_waitlist %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Company</th>
+                        <th>Status</th>
+                        <th>Priority</th>
+                        <th>Created</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in recent_waitlist %}
+                    <tr>
+                        <td>{{ entry.email }}</td>
+                        <td>{{ entry.company|default:"—" }}</td>
+                        <td><span class="badge badge-{{ entry.status }}">{{ entry.get_status_display }}</span></td>
+                        <td><strong>{{ entry.priority_score }}</strong></td>
+                        <td>{{ entry.created_at|date:"M d" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <p style="margin-top: 1rem;"><a href="{% url 'waitlist:waitlist_list' %}" class="btn btn-primary">View All Waitlist</a></p>
+        {% else %}
+            <p>No waitlist entries yet.</p>
+        {% endif %}
+    </div>
+    
+    <div class="card">
+        <h2>Recent Newsletter Subscriptions</h2>
+        {% if recent_newsletter %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Name</th>
+                        <th>Status</th>
+                        <th>Preference</th>
+                        <th>Created</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for subscription in recent_newsletter %}
+                    <tr>
+                        <td>{{ subscription.email }}</td>
+                        <td>{{ subscription.name|default:"—" }}</td>
+                        <td><span class="badge badge-{{ subscription.subscription_status }}">{{ subscription.get_subscription_status_display }}</span></td>
+                        <td>{{ subscription.get_preference_display }}</td>
+                        <td>{{ subscription.created_at|date:"M d" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <p style="margin-top: 1rem;"><a href="{% url 'newsletter:newsletter_list' %}" class="btn btn-primary">View All Newsletter</a></p>
+        {% else %}
+            <p>No newsletter subscriptions yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+

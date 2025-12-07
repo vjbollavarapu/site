@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ lead.first_name }} {{ lead.last_name }} - Lead Details{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Lead Details</h2>
+    <p><a href="{% url 'leads:lead_list' %}">&larr; Back to Leads</a></p>
+    
+    <div class="detail-section">
+        <h3>Contact Information</h3>
+        <p><strong>Name:</strong> {{ lead.first_name }} {{ lead.last_name }}</p>
+        <p><strong>Email:</strong> <a href="mailto:{{ lead.email }}">{{ lead.email }}</a></p>
+        {% if lead.phone %}
+            <p><strong>Phone:</strong> {{ lead.phone }}</p>
+        {% endif %}
+        {% if lead.company %}
+            <p><strong>Company:</strong> {{ lead.company }}</p>
+        {% endif %}
+        {% if lead.job_title %}
+            <p><strong>Job Title:</strong> {{ lead.job_title }}</p>
+        {% endif %}
+    </div>
+    
+    <div class="detail-section">
+        <h3>Lead Information</h3>
+        <p><strong>Source:</strong> {{ lead.get_lead_source_display }}</p>
+        <p><strong>Status:</strong> <span class="badge badge-{{ lead.status }}">{{ lead.get_status_display }}</span></p>
+        <p><strong>Lifecycle Stage:</strong> {{ lead.get_lifecycle_stage_display }}</p>
+        <p><strong>Lead Score:</strong> <strong>{{ lead.lead_score }}</strong></p>
+        {% if lead.industry %}
+            <p><strong>Industry:</strong> {{ lead.industry }}</p>
+        {% endif %}
+        {% if lead.company_size %}
+            <p><strong>Company Size:</strong> {{ lead.company_size }}</p>
+        {% endif %}
+    </div>
+    
+    <div class="detail-section">
+        <h3>Assignment</h3>
+        {% if lead.assigned_to %}
+            <p><strong>Assigned To:</strong> {{ lead.assigned_to.get_full_name|default:lead.assigned_to.username }}</p>
+            {% if lead.assigned_at %}
+                <p><strong>Assigned At:</strong> {{ lead.assigned_at|date:"M d, Y H:i" }}</p>
+            {% endif %}
+        {% else %}
+            <p>Not assigned</p>
+        {% endif %}
+    </div>
+    
+    <div class="detail-section">
+        <h3>Timeline</h3>
+        <p><strong>Created:</strong> {{ lead.created_at|date:"M d, Y H:i" }}</p>
+        <p><strong>Last Updated:</strong> {{ lead.updated_at|date:"M d, Y H:i" }}</p>
+        {% if lead.last_contacted_at %}
+            <p><strong>Last Contacted:</strong> {{ lead.last_contacted_at|date:"M d, Y H:i" }}</p>
+        {% endif %}
+        {% if lead.converted_at %}
+            <p><strong>Converted:</strong> {{ lead.converted_at|date:"M d, Y H:i" }}</p>
+        {% endif %}
+    </div>
+    
+    <div style="margin-top: 2rem;">
+        <a href="{% url 'admin:leads_lead_change' lead.pk %}" class="btn btn-primary">Edit in Admin</a>
+    </div>
+</div>
+{% endblock %}
+

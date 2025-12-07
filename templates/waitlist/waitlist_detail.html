@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ entry.email }} - Waitlist Entry Details{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Waitlist Entry Details</h2>
+    <p><a href="{% url 'waitlist:waitlist_list' %}">&larr; Back to Waitlist</a></p>
+    
+    <div class="detail-section">
+        <h3>Contact Information</h3>
+        <p><strong>Email:</strong> <a href="mailto:{{ entry.email }}">{{ entry.email }}</a></p>
+        {% if entry.name %}
+            <p><strong>Name:</strong> {{ entry.name }}</p>
+        {% endif %}
+        {% if entry.company %}
+            <p><strong>Company:</strong> {{ entry.company }}</p>
+        {% endif %}
+        {% if entry.role %}
+            <p><strong>Role/Job Title:</strong> {{ entry.role }}</p>
+        {% endif %}
+    </div>
+    
+    <div class="detail-section">
+        <h3>Company Details</h3>
+        {% if entry.company_size %}
+            <p><strong>Company Size:</strong> {{ entry.get_company_size_display }}</p>
+        {% endif %}
+        {% if entry.industry %}
+            <p><strong>Industry:</strong> {{ entry.get_industry_display }}</p>
+        {% endif %}
+        {% if entry.use_case %}
+            <p><strong>Use Case/Interest:</strong></p>
+            <div style="background: #f8f9fa; padding: 1rem; border-radius: 4px; margin-top: 0.5rem;">
+                {{ entry.use_case|linebreaks }}
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="detail-section">
+        <h3>Status & Priority</h3>
+        <p><strong>Status:</strong> <span class="badge badge-{{ entry.status }}">{{ entry.get_status_display }}</span></p>
+        <p><strong>Priority Score:</strong> <strong>{{ entry.priority_score }}</strong></p>
+        <p><strong>Source:</strong> {{ entry.get_source_display }}</p>
+        {% if entry.referral_code %}
+            <p><strong>Referral Code:</strong> {{ entry.referral_code }}</p>
+        {% endif %}
+    </div>
+    
+    <div class="detail-section">
+        <h3>Invitation Details</h3>
+        {% if entry.invite_code %}
+            <p><strong>Invite Code:</strong> <code>{{ entry.invite_code }}</code></p>
+        {% endif %}
+        {% if entry.invited_at %}
+            <p><strong>Invited At:</strong> {{ entry.invited_at|date:"M d, Y H:i" }}</p>
+        {% endif %}
+        {% if entry.invited_by %}
+            <p><strong>Invited By:</strong> {{ entry.invited_by.get_full_name|default:entry.invited_by.username }}</p>
+        {% endif %}
+        {% if entry.expected_start_date %}
+            <p><strong>Expected Start Date:</strong> {{ entry.expected_start_date|date:"M d, Y" }}</p>
+        {% endif %}
+    </div>
+    
+    <div class="detail-section">
+        <h3>Verification & Consent</h3>
+        <p><strong>Email Verified:</strong> {% if entry.is_verified %}Yes{% else %}No{% endif %}</p>
+        {% if entry.verified_at %}
+            <p><strong>Verified At:</strong> {{ entry.verified_at|date:"M d, Y H:i" }}</p>
+        {% endif %}
+        <p><strong>Marketing Consent:</strong> {% if entry.marketing_consent %}Yes{% else %}No{% endif %}</p>
+        {% if entry.consent_timestamp %}
+            <p><strong>Consent Timestamp:</strong> {{ entry.consent_timestamp|date:"M d, Y H:i" }}</p>
+        {% endif %}
+    </div>
+    
+    <div class="detail-section">
+        <h3>Timeline</h3>
+        <p><strong>Created:</strong> {{ entry.created_at|date:"M d, Y H:i" }}</p>
+        <p><strong>Last Updated:</strong> {{ entry.updated_at|date:"M d, Y H:i" }}</p>
+    </div>
+    
+    {% if entry.notes %}
+    <div class="detail-section">
+        <h3>Internal Notes</h3>
+        <div style="background: #f8f9fa; padding: 1rem; border-radius: 4px;">
+            {{ entry.notes|linebreaks }}
+        </div>
+    </div>
+    {% endif %}
+    
+    <div style="margin-top: 2rem;">
+        <a href="{% url 'admin:waitlist_waitlistentry_change' entry.pk %}" class="btn btn-primary">Edit in Admin</a>
+    </div>
+</div>
+{% endblock %}
+

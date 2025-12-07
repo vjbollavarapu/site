@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ contact.name }} - Contact Details{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Contact Submission Details</h2>
+    <p><a href="{% url 'contacts:contact_list' %}">&larr; Back to Contacts</a></p>
+    
+    <div class="detail-section">
+        <h3>Contact Information</h3>
+        <p><strong>Name:</strong> {{ contact.name }}</p>
+        <p><strong>Email:</strong> <a href="mailto:{{ contact.email }}">{{ contact.email }}</a></p>
+        {% if contact.phone %}
+            <p><strong>Phone:</strong> {{ contact.phone }}</p>
+        {% endif %}
+        {% if contact.company %}
+            <p><strong>Company:</strong> {{ contact.company }}</p>
+        {% endif %}
+    </div>
+    
+    <div class="detail-section">
+        <h3>Message</h3>
+        <p><strong>Subject:</strong> {{ contact.subject }}</p>
+        <p><strong>Message:</strong></p>
+        <div style="background: #f8f9fa; padding: 1rem; border-radius: 4px; margin-top: 0.5rem;">
+            {{ contact.message|linebreaks }}
+        </div>
+    </div>
+    
+    <div class="detail-section">
+        <h3>Status & Priority</h3>
+        <p><strong>Status:</strong> <span class="badge badge-{{ contact.status }}">{{ contact.get_status_display }}</span></p>
+        <p><strong>Priority:</strong> <span class="badge badge-{{ contact.priority }}">{{ contact.get_priority_display }}</span></p>
+        {% if contact.assigned_to %}
+            <p><strong>Assigned To:</strong> {{ contact.assigned_to.get_full_name|default:contact.assigned_to.username }}</p>
+        {% endif %}
+    </div>
+    
+    <div class="detail-section">
+        <h3>Timeline</h3>
+        <p><strong>Created:</strong> {{ contact.created_at|date:"M d, Y H:i" }}</p>
+        <p><strong>Last Updated:</strong> {{ contact.updated_at|date:"M d, Y H:i" }}</p>
+        {% if contact.contacted_at %}
+            <p><strong>Contacted:</strong> {{ contact.contacted_at|date:"M d, Y H:i" }}</p>
+        {% endif %}
+        {% if contact.resolved_at %}
+            <p><strong>Resolved:</strong> {{ contact.resolved_at|date:"M d, Y H:i" }}</p>
+        {% endif %}
+    </div>
+    
+    {% if contact.source or contact.referrer %}
+    <div class="detail-section">
+        <h3>Metadata</h3>
+        {% if contact.source %}
+            <p><strong>Source URL:</strong> <a href="{{ contact.source }}" target="_blank">{{ contact.source }}</a></p>
+        {% endif %}
+        {% if contact.referrer %}
+            <p><strong>Referrer:</strong> <a href="{{ contact.referrer }}" target="_blank">{{ contact.referrer }}</a></p>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    <div style="margin-top: 2rem;">
+        <a href="{% url 'admin:contacts_contactsubmission_change' contact.pk %}" class="btn btn-primary">Edit in Admin</a>
+    </div>
+</div>
+{% endblock %}
+
