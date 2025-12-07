@@ -41,7 +41,7 @@ from .serializers import (
     },
     tags=['Waitlist'],
     summary='Join waitlist',
-    description='Public endpoint to join waitlist. Creates entry and sends verification email. Rate limited: 5 requests per IP per hour.'
+    description='Public endpoint to join waitlist. Creates entry and sends verification email. Rate limited: 10 requests per IP per hour (configurable).'
 )
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -49,10 +49,14 @@ def join_waitlist(request):
     """
     Public endpoint to join waitlist
     Creates entry and sends verification email
-    Rate limited: 5 requests per IP per hour
+    Rate limited: 10 requests per IP per hour (configurable via WAITLIST_RATE_LIMIT)
     """
-    # Rate limiting check
-    if is_ratelimited(request, group='waitlist-join', key='ip', rate='5/h', method='POST', increment=True):
+    from django.conf import settings
+    # Get rate limit from settings, default to 10/h (more lenient)
+    rate_limit = getattr(settings, 'WAITLIST_RATE_LIMIT', '10/h')
+    
+    # Rate limiting check - only increment on successful submissions
+    if is_ratelimited(request, group='waitlist-join', key='ip', rate=rate_limit, method='POST', increment=False):
         return Response(
             {'error': 'Too many requests. Please try again later.'},
             status=status.HTTP_429_TOO_MANY_REQUESTS
@@ -144,6 +148,12 @@ def join_waitlist(request):
             )
         except Exception as e:
             logger.error(f"Failed to send webhook: {e}")
+        
+        # Only increment rate limit on successful submission
+        from django_ratelimit.core import is_ratelimited
+        from django.conf import settings
+        rate_limit = getattr(settings, 'WAITLIST_RATE_LIMIT', '10/h')
+        is_ratelimited(request, group='waitlist-join', key='ip', rate=rate_limit, method='POST', increment=True)
         
         return Response({
             'success': True,

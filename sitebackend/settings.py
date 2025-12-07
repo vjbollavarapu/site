@@ -294,6 +294,11 @@ SILENCED_SYSTEM_CHECKS.append('captcha.recaptcha_test_key_error')
 RATELIMIT_ENABLE = config('RATELIMIT_ENABLE', default=True, cast=bool)
 RATELIMIT_USE_CACHE = config('RATELIMIT_USE_CACHE', default='default')
 
+# Per-endpoint rate limits (configurable)
+WAITLIST_RATE_LIMIT = config('WAITLIST_RATE_LIMIT', default='10/h')  # 10 requests per hour per IP
+CONTACT_RATE_LIMIT = config('CONTACT_RATE_LIMIT', default='5/h')  # 5 requests per hour per IP
+LEAD_RATE_LIMIT = config('LEAD_RATE_LIMIT', default='10/h')  # 10 requests per hour per IP
+
 # Honeypot Configuration
 HONEYPOT_FIELD_NAME = 'website'  # Field name for honeypot
 
