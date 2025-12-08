@@ -2,9 +2,9 @@
 	"info": {
 		"_postman_id": "site-backend-api",
 		"name": "Site Backend API",
-		"description": "Comprehensive API collection for Site Backend - Contact submissions, Waitlist, Leads, Newsletter, Analytics, GDPR, Webhooks, A/B Testing, and Health endpoints",
+		"description": "Comprehensive API collection for Site Backend - Contact submissions, Waitlist, Leads, Newsletter, Analytics, GDPR, Webhooks, A/B Testing, Health, and API Documentation endpoints",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"version": "2.0.0"
+		"version": "2.1.0"
 	},
 	"item": [
 		{
@@ -141,6 +141,48 @@
 						"description": "Health check endpoint for monitoring and load balancers. Returns 200 OK if the application is healthy."
 					},
 					"response": []
+				},
+				{
+					"name": "OpenAPI Schema",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/schema/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "schema", ""]
+						},
+						"description": "Get OpenAPI 3.0 schema for API documentation."
+					},
+					"response": []
+				},
+				{
+					"name": "Swagger UI",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/docs/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "docs", ""]
+						},
+						"description": "Interactive Swagger UI for API documentation (browser only)."
+					},
+					"response": []
+				},
+				{
+					"name": "ReDoc",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/redoc/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "redoc", ""]
+						},
+						"description": "ReDoc API documentation interface (browser only)."
+					},
+					"response": []
 				}
 			]
 		},
@@ -248,9 +290,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/waitlist/?status=pending&ordering=-priority_score",
+							"raw": "{{base_url}}/api/waitlist/entries/?status=pending&ordering=-priority_score",
 							"host": ["{{base_url}}"],
-							"path": ["api", "waitlist", ""],
+							"path": ["api", "waitlist", "entries", ""],
 							"query": [
 								{
 									"key": "status",
@@ -262,7 +304,67 @@
 								}
 							]
 						},
-						"description": "List all waitlist entries (admin only)."
+						"description": "List all waitlist entries (admin only). Supports filtering and pagination."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Waitlist Entry Detail",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/waitlist/entries/:id/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "waitlist", "entries", ":id", ""],
+							"variable": [
+								{
+									"key": "id",
+									"value": "waitlist-entry-uuid-here"
+								}
+							]
+						},
+						"description": "Get details of a specific waitlist entry (admin only)."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Waitlist Entry",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Basic {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"approved\",\n    \"priority_score\": 85\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/waitlist/entries/:id/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "waitlist", "entries", ":id", ""],
+							"variable": [
+								{
+									"key": "id",
+									"value": "waitlist-entry-uuid-here"
+								}
+							]
+						},
+						"description": "Update a waitlist entry (admin only)."
 					},
 					"response": []
 				}
@@ -495,17 +597,81 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/newsletter/?subscription_status=subscribed",
+							"raw": "{{base_url}}/api/newsletter/subscribers/?subscription_status=subscribed&ordering=-subscribed_at",
 							"host": ["{{base_url}}"],
-							"path": ["api", "newsletter", ""],
+							"path": ["api", "newsletter", "subscribers", ""],
 							"query": [
 								{
 									"key": "subscription_status",
 									"value": "subscribed"
+								},
+								{
+									"key": "ordering",
+									"value": "-subscribed_at"
 								}
 							]
 						},
-						"description": "List all newsletter subscriptions (admin only)."
+						"description": "List all newsletter subscriptions (admin only). Supports filtering and pagination."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Newsletter Subscription Detail",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/newsletter/subscribers/:id/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "newsletter", "subscribers", ":id", ""],
+							"variable": [
+								{
+									"key": "id",
+									"value": "subscription-uuid-here"
+								}
+							]
+						},
+						"description": "Get details of a specific newsletter subscription (admin only)."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Newsletter Subscription",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Basic {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"subscription_status\": \"unsubscribed\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/newsletter/subscribers/:id/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "newsletter", "subscribers", ":id", ""],
+							"variable": [
+								{
+									"key": "id",
+									"value": "subscription-uuid-here"
+								}
+							]
+						},
+						"description": "Update a newsletter subscription (admin only)."
 					},
 					"response": []
 				}
@@ -584,6 +750,29 @@
 					"response": []
 				},
 				{
+					"name": "Track Conversion",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"conversion_type\": \"form_submission\",\n    \"value\": 100.00,\n    \"session_id\": \"session-uuid-here\",\n    \"conversion_properties\": {\n        \"form_type\": \"contact\",\n        \"source\": \"landing_page\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/analytics/conversion/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "analytics", "conversion", ""]
+						},
+						"description": "Track a conversion (public endpoint)."
+					},
+					"response": []
+				},
+				{
 					"name": "Get Analytics Dashboard",
 					"request": {
 						"method": "GET",
@@ -610,6 +799,92 @@
 							]
 						},
 						"description": "Get analytics dashboard data (admin only)."
+					},
+					"response": []
+				},
+				{
+					"name": "List Page Views",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/analytics/pageviews/?ordering=-timestamp",
+							"host": ["{{base_url}}"],
+							"path": ["api", "analytics", "pageviews", ""],
+							"query": [
+								{
+									"key": "ordering",
+									"value": "-timestamp"
+								}
+							]
+						},
+						"description": "List all page views (admin only). Supports filtering and pagination."
+					},
+					"response": []
+				},
+				{
+					"name": "List Events",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/analytics/events/?event_category=user_interaction&ordering=-timestamp",
+							"host": ["{{base_url}}"],
+							"path": ["api", "analytics", "events", ""],
+							"query": [
+								{
+									"key": "event_category",
+									"value": "user_interaction"
+								},
+								{
+									"key": "ordering",
+									"value": "-timestamp"
+								}
+							]
+						},
+						"description": "List all tracked events (admin only). Supports filtering and pagination."
+					},
+					"response": []
+				},
+				{
+					"name": "List Conversions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/analytics/conversions/?conversion_type=form_submission&ordering=-timestamp",
+							"host": ["{{base_url}}"],
+							"path": ["api", "analytics", "conversions", ""],
+							"query": [
+								{
+									"key": "conversion_type",
+									"value": "form_submission"
+								},
+								{
+									"key": "ordering",
+									"value": "-timestamp"
+								}
+							]
+						},
+						"description": "List all conversions (admin only). Supports filtering and pagination."
 					},
 					"response": []
 				}
@@ -704,6 +979,112 @@
 							]
 						},
 						"description": "Delete user data (public endpoint). Requires confirmation parameter."
+					},
+					"response": []
+				},
+				{
+					"name": "List Consents (Admin)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/gdpr/admin/consents/?consent_type=marketing&ordering=-consent_timestamp",
+							"host": ["{{base_url}}"],
+							"path": ["api", "gdpr", "admin", "consents", ""],
+							"query": [
+								{
+									"key": "consent_type",
+									"value": "marketing"
+								},
+								{
+									"key": "ordering",
+									"value": "-consent_timestamp"
+								}
+							]
+						},
+						"description": "List all consent records (admin only). Supports filtering and pagination."
+					},
+					"response": []
+				},
+				{
+					"name": "Manage Privacy Policy (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Basic {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"version\": \"1.0\",\n    \"content\": \"Privacy policy content here...\",\n    \"effective_date\": \"2024-01-01\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/gdpr/admin/privacy-policy/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "gdpr", "admin", "privacy-policy", ""]
+						},
+						"description": "Create or update privacy policy (admin only)."
+					},
+					"response": []
+				},
+				{
+					"name": "Manage Retention Policies (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Basic {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data_type\": \"contact\",\n    \"retention_days\": 365,\n    \"auto_delete\": true,\n    \"anonymize_instead\": false\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/gdpr/admin/retention-policies/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "gdpr", "admin", "retention-policies", ""]
+						},
+						"description": "Create or update data retention policy (admin only)."
+					},
+					"response": []
+				},
+				{
+					"name": "Apply Retention Policies (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/gdpr/admin/apply-retention/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "gdpr", "admin", "apply-retention", ""]
+						},
+						"description": "Manually trigger retention policy application (admin only)."
 					},
 					"response": []
 				}
