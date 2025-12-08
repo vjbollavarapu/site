@@ -46,3 +46,6 @@ drf-spectacular==0.27.0  # OpenAPI 3.0 schema generation
 # A/B Testing
 scipy>=1.11.0  # For statistical significance calculations
 numpy>=1.24.0  # Required by scipy
+
+# Static Files (Production)
+whitenoise==6.6.0  # Serve static files without Nginx configuration
