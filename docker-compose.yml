@@ -1,110 +1,144 @@
 version: '3.8'
 
 services:
+  # PostgreSQL Database
   db:
     image: postgres:15-alpine
-    container_name: sitebackend_db
+    container_name: sitebackend-db
     environment:
-      POSTGRES_DB: ${DB_NAME:-sitebackend}
-      POSTGRES_USER: ${DB_USER:-postgres}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-sitebackend}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "${DB_PORT:-5432}:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}"]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
-    networks:
-      - sitebackend_network
 
+  # Redis (for Celery)
   redis:
     image: redis:7-alpine
-    container_name: sitebackend_redis
+    container_name: sitebackend-redis
     ports:
-      - "${REDIS_PORT:-6379}:6379"
-    volumes:
-      - redis_data:/data
+      - "6379:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
-    networks:
-      - sitebackend_network
 
-  web:
+  # Django Backend
+  backend:
     build:
-      context: .
+      context: ./apps/backend
       dockerfile: Dockerfile
-    container_name: sitebackend_web
+    container_name: sitebackend-backend
     command: >
       sh -c "python manage.py migrate &&
              python manage.py collectstatic --noinput &&
-             gunicorn sitebackend.wsgi:application --bind 0.0.0.0:8000 --workers 4 --timeout 120"
+             gunicorn sitebackend.wsgi:application --bind 0.0.0.0:8000"
     volumes:
-      - ./staticfiles:/app/staticfiles
-      - ./mediafiles:/app/mediafiles
+      - ./apps/backend:/app
+      - static_volume:/app/staticfiles
+      - media_volume:/app/mediafiles
     ports:
-      - "${WEB_PORT:-8000}:8000"
+      - "8000:8000"
     env_file:
-      - .env
+      - ./apps/backend/.env.local
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-sitebackend}
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/admin/login/"]
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
-    networks:
-      - sitebackend_network
 
+  # Celery Worker
   celery:
     build:
-      context: .
+      context: ./apps/backend
       dockerfile: Dockerfile
-    container_name: sitebackend_celery
+    container_name: sitebackend-celery
     command: celery -A sitebackend worker -l info
     volumes:
-      - ./staticfiles:/app/staticfiles
-      - ./mediafiles:/app/mediafiles
+      - ./apps/backend:/app
     env_file:
-      - .env
+      - ./apps/backend/.env.local
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-sitebackend}
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
     depends_on:
       - db
       - redis
-      - web
-    networks:
-      - sitebackend_network
+      - backend
 
+  # Celery Beat (Scheduler)
   celery-beat:
     build:
-      context: .
+      context: ./apps/backend
       dockerfile: Dockerfile
-    container_name: sitebackend_celery_beat
+    container_name: sitebackend-celery-beat
     command: celery -A sitebackend beat -l info
     volumes:
-      - ./staticfiles:/app/staticfiles
-      - ./mediafiles:/app/mediafiles
+      - ./apps/backend:/app
     env_file:
-      - .env
+      - ./apps/backend/.env.local
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-sitebackend}
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
     depends_on:
       - db
       - redis
-      - celery
-    networks:
-      - sitebackend_network
+      - backend
+
+  # Next.js Frontend
+  frontend:
+    build:
+      context: ./apps/frontend
+      dockerfile: Dockerfile
+    container_name: sitebackend-frontend
+    command: npm run dev
+    volumes:
+      - ./apps/frontend:/app
+      - /app/node_modules
+      - /app/.next
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./apps/frontend/.env.local
+    environment:
+      - NEXT_PUBLIC_API_URL=http://backend:8000
+      - NODE_ENV=development
+    depends_on:
+      - backend
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 volumes:
   postgres_data:
-  redis_data:
+  static_volume:
+  media_volume:
 
 networks:
-  sitebackend_network:
-    driver: bridge
+  default:
+    name: sitebackend-network
+
