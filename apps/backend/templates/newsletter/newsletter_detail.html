@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ subscription.email }} - Newsletter Subscription Details{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Newsletter Subscription Details</h2>
+    <p><a href="{% url 'newsletter:newsletter_list' %}">&larr; Back to Newsletter</a></p>
+    
+    <div class="detail-section">
+        <h3>Contact Information</h3>
+        <p><strong>Email:</strong> <a href="mailto:{{ subscription.email }}">{{ subscription.email }}</a></p>
+        {% if subscription.name %}
+            <p><strong>Name:</strong> {{ subscription.name }}</p>
+        {% endif %}
+    </div>
+    
+    <div class="detail-section">
+        <h3>Subscription Details</h3>
+        <p><strong>Status:</strong> <span class="badge badge-{{ subscription.subscription_status }}">{{ subscription.get_subscription_status_display }}</span></p>
+        <p><strong>Source:</strong> {{ subscription.get_source_display }}</p>
+        <p><strong>Preference:</strong> {{ subscription.get_preference_display }}</p>
+        {% if subscription.interests %}
+            <p><strong>Interests:</strong> {{ subscription.interests|join:", " }}</p>
+        {% endif %}
+    </div>
+    
+    <div class="detail-section">
+        <h3>Verification</h3>
+        <p><strong>Email Verified:</strong> {% if subscription.is_verified %}Yes{% else %}No{% endif %}</p>
+        {% if subscription.verified_at %}
+            <p><strong>Verified At:</strong> {{ subscription.verified_at|date:"M d, Y H:i" }}</p>
+        {% endif %}
+        {% if subscription.verification_token %}
+            <p><strong>Verification Token:</strong> <code>{{ subscription.verification_token }}</code></p>
+        {% endif %}
+    </div>
+    
+    <div class="detail-section">
+        <h3>Consent</h3>
+        <p><strong>Consent Given:</strong> {% if subscription.consent_given %}Yes{% else %}No{% endif %}</p>
+        {% if subscription.consent_timestamp %}
+            <p><strong>Consent Timestamp:</strong> {{ subscription.consent_timestamp|date:"M d, Y H:i" }}</p>
+        {% endif %}
+        {% if subscription.consent_text %}
+            <p><strong>Consent Text:</strong></p>
+            <div style="background: #f8f9fa; padding: 1rem; border-radius: 4px; margin-top: 0.5rem;">
+                {{ subscription.consent_text|linebreaks }}
+            </div>
+        {% endif %}
+    </div>
+    
+    {% if subscription.subscription_status == 'unsubscribed' %}
+    <div class="detail-section">
+        <h3>Unsubscribe Information</h3>
+        {% if subscription.unsubscribed_at %}
+            <p><strong>Unsubscribed At:</strong> {{ subscription.unsubscribed_at|date:"M d, Y H:i" }}</p>
+        {% endif %}
+        {% if subscription.unsubscribe_reason %}
+            <p><strong>Reason:</strong> {{ subscription.unsubscribe_reason }}</p>
+        {% endif %}
+        {% if subscription.unsubscribe_token %}
+            <p><strong>Unsubscribe Token:</strong> <code>{{ subscription.unsubscribe_token }}</code></p>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    {% if subscription.bounce_count > 0 %}
+    <div class="detail-section">
+        <h3>Bounce Tracking</h3>
+        <p><strong>Bounce Count:</strong> <strong style="color: #e74c3c;">{{ subscription.bounce_count }}</strong></p>
+        {% if subscription.last_bounce_at %}
+            <p><strong>Last Bounce:</strong> {{ subscription.last_bounce_at|date:"M d, Y H:i" }}</p>
+        {% endif %}
+        {% if subscription.bounce_reason %}
+            <p><strong>Bounce Reason:</strong> {{ subscription.bounce_reason }}</p>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    {% if subscription.complaint_count > 0 %}
+    <div class="detail-section">
+        <h3>Complaints</h3>
+        <p><strong>Complaint Count:</strong> <strong style="color: #e74c3c;">{{ subscription.complaint_count }}</strong></p>
+        {% if subscription.last_complaint_at %}
+            <p><strong>Last Complaint:</strong> {{ subscription.last_complaint_at|date:"M d, Y H:i" }}</p>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    <div class="detail-section">
+        <h3>Metadata</h3>
+        {% if subscription.ip_address %}
+            <p><strong>IP Address:</strong> {{ subscription.ip_address }}</p>
+        {% endif %}
+        {% if subscription.referrer %}
+            <p><strong>Referrer:</strong> <a href="{{ subscription.referrer }}" target="_blank">{{ subscription.referrer }}</a></p>
+        {% endif %}
+        {% if subscription.user_agent %}
+            <p><strong>User Agent:</strong> <small>{{ subscription.user_agent }}</small></p>
+        {% endif %}
+    </div>
+    
+    <div class="detail-section">
+        <h3>Timeline</h3>
+        <p><strong>Created:</strong> {{ subscription.created_at|date:"M d, Y H:i" }}</p>
+        <p><strong>Last Updated:</strong> {{ subscription.updated_at|date:"M d, Y H:i" }}</p>
+    </div>
+    
+    <div style="margin-top: 2rem;">
+        <a href="{% url 'admin:newsletter_newslettersubscription_change' subscription.pk %}" class="btn btn-primary">Edit in Admin</a>
+    </div>
+</div>
+{% endblock %}
+

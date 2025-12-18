@@ -1,0 +1,1228 @@
+{
+	"info": {
+		"_postman_id": "site-backend-api",
+		"name": "Site Backend API",
+		"description": "Comprehensive API collection for Site Backend - Contact submissions, Waitlist, Leads, Newsletter, Analytics, GDPR, Webhooks, A/B Testing, Health, and API Documentation endpoints",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"version": "2.1.0"
+	},
+	"item": [
+		{
+			"name": "Contacts",
+			"item": [
+				{
+					"name": "Submit Contact Form",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"subject\": \"Inquiry about services\",\n    \"message\": \"I would like to know more about your services.\",\n    \"phone\": \"+1234567890\",\n    \"company\": \"Example Corp\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/contacts/submit/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "contacts", "submit", ""]
+						},
+						"description": "Public endpoint for submitting contact forms. Rate limited: 5 per IP per hour."
+					},
+					"response": []
+				},
+				{
+					"name": "List Contacts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/contacts/?status=new&ordering=-created_at",
+							"host": ["{{base_url}}"],
+							"path": ["api", "contacts", ""],
+							"query": [
+								{
+									"key": "status",
+									"value": "new"
+								},
+								{
+									"key": "ordering",
+									"value": "-created_at"
+								}
+							]
+						},
+						"description": "List all contact submissions (admin only). Supports filtering and pagination."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Contact Detail",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/contacts/:id/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "contacts", ":id", ""],
+							"variable": [
+								{
+									"key": "id",
+									"value": "contact-uuid-here"
+								}
+							]
+						},
+						"description": "Get details of a specific contact submission (admin only)."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Contact",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Basic {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"contacted\",\n    \"priority\": \"high\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/contacts/:id/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "contacts", ":id", ""],
+							"variable": [
+								{
+									"key": "id",
+									"value": "contact-uuid-here"
+								}
+							]
+						},
+						"description": "Update a contact submission (admin only)."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Health & System",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/health/",
+							"host": ["{{base_url}}"],
+							"path": ["health", ""]
+						},
+						"description": "Health check endpoint for monitoring and load balancers. Returns 200 OK if the application is healthy."
+					},
+					"response": []
+				},
+				{
+					"name": "OpenAPI Schema",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/schema/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "schema", ""]
+						},
+						"description": "Get OpenAPI 3.0 schema for API documentation."
+					},
+					"response": []
+				},
+				{
+					"name": "Swagger UI",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/docs/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "docs", ""]
+						},
+						"description": "Interactive Swagger UI for API documentation (browser only)."
+					},
+					"response": []
+				},
+				{
+					"name": "ReDoc",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/redoc/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "redoc", ""]
+						},
+						"description": "ReDoc API documentation interface (browser only)."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Waitlist",
+			"item": [
+				{
+					"name": "Join Waitlist (v1 Alias)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"user@example.com\",\n    \"name\": \"Jane Smith\",\n    \"company\": \"Tech Corp\",\n    \"role\": \"CEO\",\n    \"company_size\": \"11-50\",\n    \"industry\": \"technology\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/marketing/early-access/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "marketing", "early-access", ""]
+						},
+						"description": "API v1 alias for waitlist join endpoint (backward compatibility). Same as /api/waitlist/join/"
+					},
+					"response": []
+				},
+				{
+					"name": "Join Waitlist",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"user@example.com\",\n    \"name\": \"Jane Smith\",\n    \"company\": \"Tech Corp\",\n    \"role\": \"CEO\",\n    \"company_size\": \"11-50\",\n    \"industry\": \"technology\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/waitlist/join/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "waitlist", "join", ""]
+						},
+						"description": "Join the waitlist (public endpoint)."
+					},
+					"response": []
+				},
+				{
+					"name": "Verify Waitlist Email",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"verification-token-here\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/waitlist/verify/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "waitlist", "verify", ""]
+						},
+						"description": "Verify waitlist email address (public endpoint)."
+					},
+					"response": []
+				},
+				{
+					"name": "Check Waitlist Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/waitlist/status/:email/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "waitlist", "status", ":email", ""],
+							"variable": [
+								{
+									"key": "email",
+									"value": "user@example.com"
+								}
+							]
+						},
+						"description": "Check waitlist status by email (public endpoint)."
+					},
+					"response": []
+				},
+				{
+					"name": "List Waitlist Entries",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/waitlist/entries/?status=pending&ordering=-priority_score",
+							"host": ["{{base_url}}"],
+							"path": ["api", "waitlist", "entries", ""],
+							"query": [
+								{
+									"key": "status",
+									"value": "pending"
+								},
+								{
+									"key": "ordering",
+									"value": "-priority_score"
+								}
+							]
+						},
+						"description": "List all waitlist entries (admin only). Supports filtering and pagination."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Waitlist Entry Detail",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/waitlist/entries/:id/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "waitlist", "entries", ":id", ""],
+							"variable": [
+								{
+									"key": "id",
+									"value": "waitlist-entry-uuid-here"
+								}
+							]
+						},
+						"description": "Get details of a specific waitlist entry (admin only)."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Waitlist Entry",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Basic {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"approved\",\n    \"priority_score\": 85\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/waitlist/entries/:id/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "waitlist", "entries", ":id", ""],
+							"variable": [
+								{
+									"key": "id",
+									"value": "waitlist-entry-uuid-here"
+								}
+							]
+						},
+						"description": "Update a waitlist entry (admin only)."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Leads",
+			"item": [
+				{
+					"name": "Capture Lead",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"lead@example.com\",\n    \"first_name\": \"Jane\",\n    \"last_name\": \"Smith\",\n    \"company\": \"Tech Corp\",\n    \"lead_source\": \"website\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/leads/capture/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "leads", "capture", ""]
+						},
+						"description": "Capture a new lead (public endpoint). Rate limited: 10 per IP per hour."
+					},
+					"response": []
+				},
+				{
+					"name": "Track Lead Event",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"event_name\": \"button_click\",\n    \"event_category\": \"user_interaction\",\n    \"event_properties\": {\n        \"button_id\": \"signup\",\n        \"page\": \"/pricing\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/leads/:id/track-event/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "leads", ":id", "track-event", ""],
+							"variable": [
+								{
+									"key": "id",
+									"value": "lead-uuid-here"
+								}
+							]
+						},
+						"description": "Track an event for a specific lead (public endpoint)."
+					},
+					"response": []
+				},
+				{
+					"name": "List Leads",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/leads/?status=qualified&score_min=50&ordering=-lead_score",
+							"host": ["{{base_url}}"],
+							"path": ["api", "leads", ""],
+							"query": [
+								{
+									"key": "status",
+									"value": "qualified"
+								},
+								{
+									"key": "score_min",
+									"value": "50"
+								},
+								{
+									"key": "ordering",
+									"value": "-lead_score"
+								}
+							]
+						},
+						"description": "List all leads (admin only)."
+					},
+					"response": []
+				},
+				{
+					"name": "Qualify Lead",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/leads/:id/qualify/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "leads", ":id", "qualify", ""],
+							"variable": [
+								{
+									"key": "id",
+									"value": "lead-uuid-here"
+								}
+							]
+						},
+						"description": "Qualify a lead (admin only)."
+					},
+					"response": []
+				},
+				{
+					"name": "Convert Lead",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/leads/:id/convert/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "leads", ":id", "convert", ""],
+							"variable": [
+								{
+									"key": "id",
+									"value": "lead-uuid-here"
+								}
+							]
+						},
+						"description": "Convert a lead to customer (admin only)."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Newsletter",
+			"item": [
+				{
+					"name": "Subscribe Newsletter",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"subscriber@example.com\",\n    \"name\": \"John Doe\",\n    \"source\": \"website\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/newsletter/subscribe/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "newsletter", "subscribe", ""]
+						},
+						"description": "Subscribe to newsletter (public endpoint)."
+					},
+					"response": []
+				},
+				{
+					"name": "Verify Newsletter Email",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"subscriber@example.com\",\n    \"token\": \"verification-token-here\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/newsletter/verify/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "newsletter", "verify", ""]
+						},
+						"description": "Verify newsletter email address (public endpoint)."
+					},
+					"response": []
+				},
+				{
+					"name": "Unsubscribe Newsletter",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"subscriber@example.com\",\n    \"token\": \"unsubscribe-token-here\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/newsletter/unsubscribe/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "newsletter", "unsubscribe", ""]
+						},
+						"description": "Unsubscribe from newsletter (public endpoint)."
+					},
+					"response": []
+				},
+				{
+					"name": "List Newsletter Subscriptions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/newsletter/subscribers/?subscription_status=subscribed&ordering=-subscribed_at",
+							"host": ["{{base_url}}"],
+							"path": ["api", "newsletter", "subscribers", ""],
+							"query": [
+								{
+									"key": "subscription_status",
+									"value": "subscribed"
+								},
+								{
+									"key": "ordering",
+									"value": "-subscribed_at"
+								}
+							]
+						},
+						"description": "List all newsletter subscriptions (admin only). Supports filtering and pagination."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Newsletter Subscription Detail",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/newsletter/subscribers/:id/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "newsletter", "subscribers", ":id", ""],
+							"variable": [
+								{
+									"key": "id",
+									"value": "subscription-uuid-here"
+								}
+							]
+						},
+						"description": "Get details of a specific newsletter subscription (admin only)."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Newsletter Subscription",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Basic {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"subscription_status\": \"unsubscribed\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/newsletter/subscribers/:id/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "newsletter", "subscribers", ":id", ""],
+							"variable": [
+								{
+									"key": "id",
+									"value": "subscription-uuid-here"
+								}
+							]
+						},
+						"description": "Update a newsletter subscription (admin only)."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Analytics",
+			"item": [
+				{
+					"name": "Track Page View",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"session_id\": \"session-uuid-here\",\n    \"page_url\": \"https://example.com/page\",\n    \"page_title\": \"Example Page\",\n    \"referrer\": \"https://google.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/analytics/pageview/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "analytics", "pageview", ""]
+						},
+						"description": "Track a page view (public endpoint). Rate limited: 10 per IP per hour."
+					},
+					"response": []
+				},
+				{
+					"name": "Track Event",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"event_name\": \"button_click\",\n    \"event_category\": \"user_interaction\",\n    \"session_id\": \"session-uuid-here\",\n    \"page_url\": \"https://example.com/page\",\n    \"event_properties\": {\n        \"button_id\": \"signup\",\n        \"page\": \"/pricing\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/analytics/event/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "analytics", "event", ""]
+						},
+						"description": "Track a custom event (public endpoint)."
+					},
+					"response": []
+				},
+				{
+					"name": "Track Conversion",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"conversion_type\": \"form_submission\",\n    \"value\": 100.00,\n    \"session_id\": \"session-uuid-here\",\n    \"conversion_properties\": {\n        \"form_type\": \"contact\",\n        \"source\": \"landing_page\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/analytics/conversion/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "analytics", "conversion", ""]
+						},
+						"description": "Track a conversion (public endpoint)."
+					},
+					"response": []
+				},
+				{
+					"name": "Track Conversion",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"conversion_type\": \"form_submission\",\n    \"value\": 100.00,\n    \"session_id\": \"session-uuid-here\",\n    \"conversion_properties\": {\n        \"form_type\": \"contact\",\n        \"source\": \"landing_page\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/analytics/conversion/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "analytics", "conversion", ""]
+						},
+						"description": "Track a conversion (public endpoint)."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Analytics Dashboard",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/analytics/dashboard/?start_date=2024-01-01&end_date=2024-01-31",
+							"host": ["{{base_url}}"],
+							"path": ["api", "analytics", "dashboard", ""],
+							"query": [
+								{
+									"key": "start_date",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "end_date",
+									"value": "2024-01-31"
+								}
+							]
+						},
+						"description": "Get analytics dashboard data (admin only)."
+					},
+					"response": []
+				},
+				{
+					"name": "List Page Views",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/analytics/pageviews/?ordering=-timestamp",
+							"host": ["{{base_url}}"],
+							"path": ["api", "analytics", "pageviews", ""],
+							"query": [
+								{
+									"key": "ordering",
+									"value": "-timestamp"
+								}
+							]
+						},
+						"description": "List all page views (admin only). Supports filtering and pagination."
+					},
+					"response": []
+				},
+				{
+					"name": "List Events",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/analytics/events/?event_category=user_interaction&ordering=-timestamp",
+							"host": ["{{base_url}}"],
+							"path": ["api", "analytics", "events", ""],
+							"query": [
+								{
+									"key": "event_category",
+									"value": "user_interaction"
+								},
+								{
+									"key": "ordering",
+									"value": "-timestamp"
+								}
+							]
+						},
+						"description": "List all tracked events (admin only). Supports filtering and pagination."
+					},
+					"response": []
+				},
+				{
+					"name": "List Conversions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/analytics/conversions/?conversion_type=form_submission&ordering=-timestamp",
+							"host": ["{{base_url}}"],
+							"path": ["api", "analytics", "conversions", ""],
+							"query": [
+								{
+									"key": "conversion_type",
+									"value": "form_submission"
+								},
+								{
+									"key": "ordering",
+									"value": "-timestamp"
+								}
+							]
+						},
+						"description": "List all conversions (admin only). Supports filtering and pagination."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "GDPR",
+			"item": [
+				{
+					"name": "Manage Consent",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"user@example.com\",\n    \"consent_type\": \"marketing\",\n    \"consent_given\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/gdpr/consent/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "gdpr", "consent", ""]
+						},
+						"description": "Give or withdraw consent (public endpoint). Rate limited: 10 per IP per hour."
+					},
+					"response": []
+				},
+				{
+					"name": "Export User Data",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/gdpr/export/:email/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "gdpr", "export", ":email", ""],
+							"variable": [
+								{
+									"key": "email",
+									"value": "user@example.com"
+								}
+							]
+						},
+						"description": "Export all user data (public endpoint)."
+					},
+					"response": []
+				},
+				{
+					"name": "Access User Data",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/gdpr/access/:email/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "gdpr", "access", ":email", ""],
+							"variable": [
+								{
+									"key": "email",
+									"value": "user@example.com"
+								}
+							]
+						},
+						"description": "Access user data (public endpoint)."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User Data",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/gdpr/delete/:email/?confirmation=true",
+							"host": ["{{base_url}}"],
+							"path": ["api", "gdpr", "delete", ":email", ""],
+							"query": [
+								{
+									"key": "confirmation",
+									"value": "true"
+								}
+							],
+							"variable": [
+								{
+									"key": "email",
+									"value": "user@example.com"
+								}
+							]
+						},
+						"description": "Delete user data (public endpoint). Requires confirmation parameter."
+					},
+					"response": []
+				},
+				{
+					"name": "List Consents (Admin)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/gdpr/admin/consents/?consent_type=marketing&ordering=-consent_timestamp",
+							"host": ["{{base_url}}"],
+							"path": ["api", "gdpr", "admin", "consents", ""],
+							"query": [
+								{
+									"key": "consent_type",
+									"value": "marketing"
+								},
+								{
+									"key": "ordering",
+									"value": "-consent_timestamp"
+								}
+							]
+						},
+						"description": "List all consent records (admin only). Supports filtering and pagination."
+					},
+					"response": []
+				},
+				{
+					"name": "Manage Privacy Policy (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Basic {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"version\": \"1.0\",\n    \"content\": \"Privacy policy content here...\",\n    \"effective_date\": \"2024-01-01\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/gdpr/admin/privacy-policy/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "gdpr", "admin", "privacy-policy", ""]
+						},
+						"description": "Create or update privacy policy (admin only)."
+					},
+					"response": []
+				},
+				{
+					"name": "Manage Retention Policies (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Basic {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data_type\": \"contact\",\n    \"retention_days\": 365,\n    \"auto_delete\": true,\n    \"anonymize_instead\": false\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/gdpr/admin/retention-policies/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "gdpr", "admin", "retention-policies", ""]
+						},
+						"description": "Create or update data retention policy (admin only)."
+					},
+					"response": []
+				},
+				{
+					"name": "Apply Retention Policies (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/gdpr/admin/apply-retention/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "gdpr", "admin", "apply-retention", ""]
+						},
+						"description": "Manually trigger retention policy application (admin only)."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Webhooks",
+			"item": [
+				{
+					"name": "Test Webhook",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Webhook-Event",
+								"value": "test_event",
+								"type": "text"
+							},
+							{
+								"key": "X-Webhook-Signature",
+								"value": "sha256=...",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"test\": \"data\",\n    \"timestamp\": \"2024-01-01T00:00:00Z\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/webhooks/test/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "webhooks", "test", ""]
+						},
+						"description": "Test webhook endpoint for verifying webhook configuration. Accepts POST request and returns the received payload."
+					},
+					"response": []
+				},
+				{
+					"name": "Verify Webhook Signature",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"payload\": {\n        \"event\": \"test\",\n        \"data\": \"example\"\n    },\n    \"signature\": \"sha256=...\",\n    \"secret_key\": \"your-secret-key\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/webhooks/verify/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "webhooks", "verify", ""]
+						},
+						"description": "Verify webhook signature. Used to validate webhook payload authenticity."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "A/B Testing",
+			"item": [
+				{
+					"name": "Get Variant",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/ab-testing/variant/:test_name/?user_identifier=user@example.com",
+							"host": ["{{base_url}}"],
+							"path": ["api", "ab-testing", "variant", ":test_name", ""],
+							"query": [
+								{
+									"key": "user_identifier",
+									"value": "user@example.com",
+									"description": "Email, session_id, or other unique identifier"
+								}
+							],
+							"variable": [
+								{
+									"key": "test_name",
+									"value": "landing_page_variant",
+									"description": "Name of the A/B test"
+								}
+							]
+						},
+						"description": "Get variant assignment for a user in an A/B test (public endpoint). Returns 'A' or 'B' variant."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Test Results",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/ab-testing/results/:test_name/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "ab-testing", "results", ":test_name", ""],
+							"variable": [
+								{
+									"key": "test_name",
+									"value": "landing_page_variant",
+									"description": "Name of the A/B test"
+								}
+							]
+						},
+						"description": "Get A/B test results including conversion rates and statistical significance (admin only)."
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"type": "string"
+		},
+		{
+			"key": "auth_token",
+			"value": "your-auth-token-here",
+			"type": "string"
+		}
+	]
+}
+

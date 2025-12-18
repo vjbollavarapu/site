@@ -1,0 +1,15 @@
+Verify Your Email
+
+Hello {{ name }},
+
+Thank you for joining our waitlist! To complete your registration, please verify your email address by visiting:
+
+{{ verification_url }}
+
+This verification link will expire in {{ expires_hours }} hours.
+
+If you didn't sign up for our waitlist, please ignore this email.
+
+Best regards,
+The Team
+

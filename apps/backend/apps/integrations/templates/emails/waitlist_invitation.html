@@ -1,0 +1,33 @@
+{% extends "emails/base.html" %}
+
+{% block title %}You're in! Welcome{% endblock %}
+
+{% block header %}You're In! 🎉{% endblock %}
+
+{% block content %}
+<p>Hello {{ name }},</p>
+
+<p>Great news! You've been approved and invited to join our platform. We're excited to have you on board!</p>
+
+<p>Use your invite code to get started:</p>
+<div class="code">{{ invite_code }}</div>
+
+<p style="text-align: center;">
+    <a href="{{ invite_url }}" class="button">Get Started Now</a>
+</p>
+
+<p>Or visit <a href="{{ invite_url }}">{{ invite_url }}</a> and enter your invite code.</p>
+
+<p><strong>What's next?</strong></p>
+<ul>
+    <li>Click the button above or use your invite code</li>
+    <li>Complete your account setup</li>
+    <li>Start exploring our platform</li>
+</ul>
+
+<p>We're here to help if you have any questions. Welcome aboard!</p>
+
+<p>Best regards,<br>
+The Team</p>
+{% endblock %}
+

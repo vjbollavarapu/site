@@ -1,0 +1,22 @@
+Welcome to our newsletter!
+
+Hello {{ name }},
+
+Welcome to our newsletter! We're thrilled to have you join our community.
+
+What to expect:
+- Weekly updates and insights
+- Exclusive content and offers
+- Latest news and announcements
+- Tips and best practices
+
+Your email preference is set to: {{ preference }}
+
+You can manage your preferences or unsubscribe at any time:
+{{ manage_url }}
+
+Thank you for subscribing, and we look forward to sharing valuable content with you!
+
+Best regards,
+The Team
+

@@ -1,0 +1,13 @@
+Confirm Your Subscription
+
+Hello {{ name }},
+
+Thank you for subscribing to our newsletter! To complete your subscription, please confirm your email address by visiting:
+
+{{ verification_url }}
+
+If you didn't subscribe to our newsletter, you can safely ignore this email or unsubscribe here: {{ unsubscribe_url }}
+
+Best regards,
+The Team
+
